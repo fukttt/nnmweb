@@ -5,15 +5,15 @@ from urllib.parse import quote
 from bs4 import BeautifulSoup
 
 class Parser(object):
-    async def get_films(self, page):
+    async def get_films(self, page, c):
         lines = []
         pageUrl = "&start=" + str((page-1)*20)
         if page == 1:
             pageUrl = ""
         conn = ProxyConnector.from_url('socks5://195.2.74.75:9050')
         async with aiohttp.ClientSession(connector=conn) as session:
-            async with session.get("http://nnmclub.to/forum/portal.php?c=10" + pageUrl) as resp:
-                print ("http://nnmclub.to/forum/portal.php?c=10" + pageUrl)
+            async with session.get("http://nnmclub.to/forum/portal.php?c=" + str(c) + pageUrl) as resp:
+                #print ("http://nnmclub.to/forum/portal.php?c=10" + pageUrl)
                 soup =  BeautifulSoup(await resp.read(), 'html.parser')
                 for link in  soup.select('td[width="80%"] .pline'):
                     nameTor = ""
@@ -40,9 +40,9 @@ class Parser(object):
         lines = []
         conn = ProxyConnector.from_url('socks5://195.2.74.75:9050')
         async with aiohttp.ClientSession(connector=conn) as session:
-            payload = {'f': '-1', 'nm': quote(name), 'search_submit' : '%C8%F1%EA%E0%F2%FC'}
-            print(payload)
-            async with session.post("https://nnmclub.to/forum/tracker.php", data=payload) as resp:
+            headers = {'Content-Type': 'application/x-www-form-urlencoded', 'Referer' : 'https://nnmclub.to/', 'Origin' : 'https://nnmclub.to', 'Upgrade-Insecure-Requests' : '1'}
+
+            async with session.post("https://nnmclub.to/forum/tracker.php", data='f=-1&nm='+quote(name.encode('cp1251'))+'&search_submit=%C8%F1%EA%E0%F2%FC', headers=headers,verify_ssl=False) as resp:
                 soup =  BeautifulSoup(await resp.read(), 'html.parser')
                 
                 for link in  soup.select('.genmed'):
@@ -53,9 +53,8 @@ class Parser(object):
                     for img in link.select('a'):
                         linkTor = img['href']
                         
-                    print(nameTor)
+                    #print(nameTor)
                     
                     if  nameTor != "" and linkTor!= "":
                         lines.append(nameTor + " : " + linkTor)
                 return lines
-    
