@@ -53,13 +53,12 @@
                   <li class="nav-item">
                      <a class="nav-link {% if request.endpoint=='games' %}active{%endif %}" href="/games">Игры</a>
                   </li>
-                  <li class="nav-item {% if request.endpoint=='about' %}active{%endif %}">
-                     <a class="nav-link" href="/about">Об авторе</a>
+                  <li class="nav-item ">
+                     <a class="nav-link {% if request.endpoint=='about' %}active{%endif %}" href="/about">Об авторе</a>
                   </li>
-                   <li class="nav-item {% if request.endpoint=='settings' %}active{%endif %}">
-                     <a class="nav-link" href="/settings">Настройки</a>
+                   <li class="nav-item ">
+                     <a class="nav-link {% if request.endpoint=='settings' %}active{%endif %}" href="/settings">Настройки</a>
                   </li>
-
 
                </ul>
               <ul class="nav navbar-nav navbar-right">
@@ -72,29 +71,16 @@
             </div>
          </div>
       </nav>
-      <nav aria-label="Page navigation example" style="padding-top: 15px;">
-         <ul class="pagination justify-content-center">
-            <li class="page-item"><a class="page-link" href="?page={{page-1}}"><span aria-hidden="true">&laquo;</span></a></li>
-            <li class="page-item active"><a class="page-link " href="#">{{page}}</a></li>
-            <li class="page-item"><a class="page-link" href="?page={{page+1}}"><span aria-hidden="true">&raquo;</span></a></li>
-         </ul>
-      </nav>
-      <div class="container">
-         <div class="row" style="color:#fff;">
-            {% for l in lis %}
-            <div class="col-md-3" style="padding:10px;overflow: hidden;position: relative;text-align: center;">
-               <img src="{{l.split(' : ')[1]}}" class="filmPhoto" alt="logo" style="max-width: 100%;border-radius: 5% 5% 0 0;-webkit-box-shadow: 5px 5px 15px -3px #000000; box-shadow: 5px 5px 15px -3px #000000;">
-               <span id="b" style="position: absolute;bottom: 10px;left:10px;background-color:#732859;">{{l.split(' : ')[0]}}</span>
-               <a href=" {{l.split(' : ')[2]}}" style="position: absolute; color:#8677ff;top:20px;border-radius:10%;right: 20px;padding:5px;text-decoration: none;align-items: center;background-color: rgb(43 38 38 / 80%);display: flex;flex-direction: column;">
-               <span class="material-icons">get_app</span> <span>{{l.split(' : ')[3]}}</span>
-               </a>
-               <button class="btn btn-primary" onclick="newmagnet('{{l.split(' : ')[2]}}')" style="position: absolute; top: 20px; left:20px;"><span class="material-icons">
-cloud_download
-</span></button>
-            </div>
-            {% endfor %}
-         </div>
+
+      <div class="container bg-light p-3" >
+              <div class="mb-3">
+                <label for="path" class="form-label">Папка с загрузками</label>
+                <input type="text" class="form-control" id="path" value="{{path}}">
+                <div id="emailHelp" class="form-text">Измени на требуемое значение и нажми "Изменить".</div>
+              </div>
+            <button class="btn btn-primary" onclick="changepath()">Изменить</button>
       </div>
+
 
 
    <!-- Modal -->
@@ -120,6 +106,20 @@ cloud_download
       <!-- JavaScript -->
       <script src="//cdn.jsdelivr.net/npm/alertifyjs@1.13.1/build/alertify.min.js"></script>
       <script>
+          function changepath(){
+            var xhr = new XMLHttpRequest();
+               xhr.open("POST", '/setPath', true);
+               xhr.setRequestHeader('Content-Type', 'application/json');
+               xhr.onreadystatechange = function() {
+                   if (xhr.readyState == XMLHttpRequest.DONE) {
+                       var data = JSON.parse(xhr.responseText);
+                       alertify.success(data['message']);
+                   }
+               }
+               xhr.send(JSON.stringify({
+                   path : document.getElementById('path').value
+               }));
+          }
          function newmagnet(url){
            var xhr = new XMLHttpRequest();
            xhr.open("POST", '/newTorrent', true);
