@@ -1,7 +1,7 @@
 from pars import *
-from flask import Flask, request, render_template, redirect, url_for
+from flask import Flask, request, render_template, redirect, url_for, send_from_directory
 from flask_cors import CORS
-import configparser
+import configparser, os
 from utils import torrent
 import json
 
@@ -86,6 +86,23 @@ async def setPath():
         return {"error": 0, "message": "Changed succesfully."}, 200
     except Exception as e:
         return {"error" : 1, "message" : str(e)}, 400
+
+@app.route("/files")
+async def files():
+    try:
+        a = []
+        for filename in os.listdir(config['DEFAULT']['downloadpath']):
+            a.append(filename)
+        return render_template('films.html', torCount=str(len(torrentList)), files=a)
+    except Exception as e:
+        return {"error" : 1, "message" : str(e)}, 400
+@app.route("/getfile/<file>")
+async def getfile(file):
+    try:
+        return send_from_directory(config['DEFAULT']['downloadpath'], file)
+    except Exception as e:
+        return {"error" : 1, "message" : str(e)}, 400
+
 
 if __name__=="__main__":
 
