@@ -1,3 +1,6 @@
-Flask==2.0.1
+Flask[async]
 aiohttp==3.7.4.post0
 beautifulsoup4==4.9.3
+aiohttp_socks
+flask_cors
+python-libtorrent-bin
